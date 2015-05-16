@@ -16,6 +16,9 @@ var Workbook = function (data) {
     var workbookText = this._zip.file("xl/workbook.xml").asText();
     this._workbookXML = etree.parse(workbookText);
 
+    var stylesText = this._zip.file("xl/styles.xml").asText();
+    this._stylesXML = etree.parse(stylesText);
+
     this.sheets = [];
     var sheetNodes = this._workbookXML.findall("*/sheet");
 
@@ -34,7 +37,7 @@ var Workbook = function (data) {
         var formulaParents = sheetXML.findall("sheetData/row/c/f/..");
         formulaParents.forEach(removeValueNode);
 
-        var sheet = new Sheet(this, sheetNodes[i], sheetXML);
+        var sheet = new Sheet(this, sheetNodes[i], sheetXML, this._stylesXML);
         this.sheets.push(sheet);
     }
 };
@@ -75,6 +78,7 @@ Workbook.prototype.getNamedCell = function (cellName) {
  */
 Workbook.prototype.output = function () {
     this._zip.file("xl/workbook.xml", this._workbookXML.write());
+    this._zip.file("xl/styles.xml", this._stylesXML.write());
 
     for (var i = 0; i < this.sheets.length; i++) {
         var index = i + 1;

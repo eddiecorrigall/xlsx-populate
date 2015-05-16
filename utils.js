@@ -1,9 +1,27 @@
 "use strict";
 
+var etree = require('elementtree'),
+    subelement = etree.SubElement;
+
 /**
  * Regex to parse Excel addresses.
  */
 var addressRegex = /^\s*(?:'?(.+?)'?\!)?\$?([A-Z]+)\$?(\d+)\s*$/i;
+
+/**
+ * The base date to use for Excel conversion.
+ */
+var dateBase = new Date(1900, 0, 0);
+
+/**
+ * The last day in February 1900.
+ */
+var incorrectLeapDate = new Date(1900, 1, 28);
+
+/**
+ * Number of milliseconds in a day.
+ */
+var millisecondsInDay = 1000 * 60 * 60 * 24;
 
 module.exports = {
     /**
@@ -86,5 +104,41 @@ module.exports = {
         if (match[1]) ref.sheet = match[1];
 
         return ref;
+    },
+
+    /**
+     * Converts a date to an Excel number. (The number of days since 1/1/1900.
+     * @param {Date} date
+     * @returns {number}
+     */
+    dateToExcelNumber: function (date) {
+        var num = (date - dateBase) / millisecondsInDay;
+
+        // "Bug" in Excel that treats 1900 as a leap year.
+        if (date > incorrectLeapDate) num += 1;
+
+        return num;
+    },
+
+    copyOrAddNode: function (xml, parentPath, childName, currentIndex) {
+        var parentNode = xml.find(parentPath);
+        var childNodes = parentNode.findall(childName);
+
+        var childNode;
+        var index = childNodes.length;
+
+        if (currentIndex === undefined) {
+            childNode = subelement(parentNode, childName);
+        } else {
+            currentIndex = parseInt(currentIndex);
+            var currentNode = childNodes[currentIndex];
+            childNode = JSON.parse(JSON.stringify(currentNode));
+            parentNode.append(childNode);
+        }
+
+        return {
+            node: childNode,
+            index: index
+        };
     }
 };

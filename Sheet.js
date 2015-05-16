@@ -13,10 +13,11 @@ var utils = require('./utils'),
  * @param {etree.Element} sheetXML
  * @constructor
  */
-var Sheet = function (workbook, sheetNode, sheetXML) {
+var Sheet = function (workbook, sheetNode, sheetXML, stylesXML) {
     this._workbook = workbook;
     this._sheetNode = sheetNode;
     this._sheetXML = sheetXML;
+    this._stylesXML = stylesXML;
 };
 
 /**
@@ -35,6 +36,7 @@ Sheet.prototype.getName = function () {
     return this._sheetNode.attrib.name;
 };
 
+// TODO: Fix cell references.
 Sheet.prototype.setName = function (name) {
     this._sheetNode.attrib.name = name;
 };
@@ -69,7 +71,7 @@ Sheet.prototype.getCell = function () {
         cellNode.attrib.r = address;
     }
 
-    return new Cell(this, row, column, cellNode);
+    return new Cell(this, row, column, cellNode, this._stylesXML);
 };
 
 module.exports = Sheet;

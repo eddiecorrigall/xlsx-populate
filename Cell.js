@@ -2,7 +2,8 @@
 
 var etree = require('elementtree'),
     subelement = etree.SubElement,
-    utils = require('./utils');
+    utils = require('./utils'),
+    Style = require('./Style');
 
 /**
  * Initializes a new Cell.
@@ -12,11 +13,12 @@ var etree = require('elementtree'),
  * @param {etree.SubElement} cellNode
  * @constructor
  */
-var Cell = function (sheet, row, column, cellNode) {
+var Cell = function (sheet, row, column, cellNode, stylesXML) {
     this._sheet = sheet;
     this._row = row;
     this._column = column;
     this._cellNode = cellNode;
+    this._stylesXML = stylesXML;
 };
 
 /**
@@ -65,6 +67,7 @@ Cell.prototype.getFullAddress = function () {
  * @returns {Cell}
  */
 Cell.prototype.setValue = function (value) {
+    var vNode;
     this._clearContents();
 
     if (typeof value === "string") {
@@ -72,9 +75,17 @@ Cell.prototype.setValue = function (value) {
         var isNode = subelement(this._cellNode, "is");
         var tNode = subelement(isNode, "t");
         tNode.text = value;
-    } else {
-        var vNode = subelement(this._cellNode, "v");
+    } else if (typeof value === "number") {
+        vNode = subelement(this._cellNode, "v");
         vNode.text = value;
+    } else if (typeof value === "boolean") {
+        this._cellNode.attrib.t = "b";
+        vNode = subelement(this._cellNode, "v");
+        vNode.text = value ? 1 : 0;
+    } else if (value instanceof Date) {
+        // TODO: Style
+        vNode = subelement(this._cellNode, "v");
+        vNode.text = utils.dateToExcelNumber(value);
     }
 
     return this;
@@ -98,6 +109,12 @@ Cell.prototype.setFormula = function (formula, calculatedValue) {
     }
 
     return this;
+};
+
+Cell.prototype.getStyle = function () {
+    var nodeAndIndex = utils.copyOrAddNode(this._stylesXML, "cellXfs", "xf", this._cellNode.attrib.s);
+    this._cellNode.attrib.s = nodeAndIndex.index;
+    return new Style(nodeAndIndex.node, this._stylesXML);
 };
 
 /**

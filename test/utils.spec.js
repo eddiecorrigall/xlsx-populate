@@ -111,4 +111,13 @@ describe("utils", function () {
             expect(utils.addressToRowAndColumn(5)).toBe(undefined);
         });
     });
+
+    describe("dateToExcelNumber", function () {
+        it("should convert date to Excel number", function () {
+            expect(utils.dateToExcelNumber(new Date(1900, 0, 1))).toBe(1);
+            expect(utils.dateToExcelNumber(new Date(1900, 1, 28))).toBe(59);
+            expect(utils.dateToExcelNumber(new Date(1900, 2, 1))).toBe(61);
+            expect(utils.dateToExcelNumber(new Date(2015, 2, 7, 13, 23))).toBeCloseTo(42070.56);
+        });
+    });
 });
