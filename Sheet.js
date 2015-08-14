@@ -103,8 +103,8 @@ Sheet.prototype.getCell = function () {
 };
 
 /**
- * Given a row, assign column values to the row for eahc column name and value pair provided.
- * Example: sheet.setRow(4, { 'A': 'abc', 'D': 123 });
+ * Given a row, assign column values to the row for each column name and value pair provided.
+ * Example: sheet.setColumnValues(4, { 'A': 'abc', 'D': 123 });
  */
 Sheet.prototype.setColumnValues = function (row, columnValues) {
     for (var columnNameOrIndex in columnValues) {
