@@ -57,6 +57,12 @@ You can set the cell value or formula:
 cell.setValue("foo");
 cell.setValue(5.6);
 cell.setFormula("SUM(A1:A5)");
+// set shared index at cell
+cell.setFormula(null, null, 0);
+// at row 5, set value at column A to 'abc' and B to 123
+sheet.setColumnValues(5, {A: "abc", B: 123});
+// extend the existing shared formulas at F2, G2, H2, I2, J2, and K2 along 433 rows
+sheet.setShareFormulaColumns(433, ['F2', 'G2', 'H2', 'I2', 'J2', 'K2']);
 ```
 
 ### Serving from Express
