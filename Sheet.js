@@ -17,6 +17,7 @@ var Sheet = function (workbook, sheetNode, sheetXML) {
     this._workbook = workbook;
     this._sheetNode = sheetNode;
     this._sheetXML = sheetXML;
+    this._cells = {};
 };
 
 /**
@@ -44,32 +45,61 @@ Sheet.prototype.setName = function (name) {
  * @returns {Cell}
  */
 Sheet.prototype.getCell = function () {
+
     var row, column, address;
+
     if (arguments.length === 1) {
         address = arguments[0];
         var ref = utils.addressToRowAndColumn(address);
         row = ref.row;
         column = ref.column;
-    } else {
+    }
+    else {
         row = arguments[0];
         column = arguments[1];
         address = utils.rowAndColumnToAddress(row, column);
     }
 
-    var sheetDataNode = this._sheetXML.find("sheetData");
-    var rowNode = sheetDataNode.find("row[@r='" + row + "']");
-    if (!rowNode) {
-        rowNode = subelement(sheetDataNode, "row");
-        rowNode.attrib.r = row;
+    var getRowNode = function (sheetDataNode, row) {
+        var rowNodes = sheetDataNode.findall('./row');
+        for (var i = 0; i < rowNodes.length; i++) {
+            if (parseInt(rowNodes[i].get('r')) === row) {
+                return rowNodes[i];
+            }
+        }
+        return null;
+    };
+
+    var getCellNode = function (rowNode, address) {
+        var columnNodes = rowNode.findall('./c');
+        for (var i = 0; i < columnNodes.length; i++) {
+            if (columnNodes[i].get('r') === address) {
+                return columnNodes[i];
+            }
+        }
+        return null;
     }
 
-    var cellNode = rowNode.find("c[@r='" + address + "']");
-    if (!cellNode) {
-        cellNode = subelement(rowNode, "c");
-        cellNode.attrib.r = address;
+    if ((address in this._cells) === false) {
+        
+        var sheetDataNode = this._sheetXML.find('./sheetData');
+        
+        var rowNode = getRowNode(sheetDataNode, row);
+        if (!rowNode) {
+            rowNode = subelement(sheetDataNode, 'row');
+            rowNode.set('r', row);
+        }
+        
+        var cellNode = getCellNode(rowNode, address);
+        if (!cellNode) {
+            cellNode = subelement(rowNode, 'c');
+            cellNode.set('r', address);
+        }
+
+        this._cells[address] = new Cell(this, row, column, cellNode);
     }
 
-    return new Cell(this, row, column, cellNode);
+    return this._cells[address];
 };
 
 module.exports = Sheet;
