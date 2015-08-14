@@ -13,7 +13,7 @@ module.exports = {
      * @returns {boolean}
      */
     isInteger: function (value) {
-        return value === +value && value === (value | 0);
+        return (value === parseInt(value, 10));
     },
 
     /**
