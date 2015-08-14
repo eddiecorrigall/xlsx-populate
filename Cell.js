@@ -65,39 +65,117 @@ Cell.prototype.getFullAddress = function () {
  * @returns {Cell}
  */
 Cell.prototype.setValue = function (value) {
-    this._clearContents();
-
-    if (typeof value === "string") {
-        this._cellNode.attrib.t = "inlineStr";
-        var isNode = subelement(this._cellNode, "is");
-        var tNode = subelement(isNode, "t");
-        tNode.text = value;
-    } else {
-        var vNode = subelement(this._cellNode, "v");
-        vNode.text = value.toString();
+    switch (typeof(value)) {
+        case 'number': {
+            this._clearContents();
+            this._cellNode.set('t', 'n');
+            var vNode = subelement(this._cellNode, 'v');
+            vNode.text = ('' + value);
+        } break;
+        case 'string': { // Not tested
+            this._clearContents();
+            this._cellNode.set('t', 'inlineStr');
+            var isNode = subelement(this._cellNode, 'is');
+            var tNode = subelement(isNode, 't');
+            tNode.text = value;
+        } break;
+        case 'boolean': { // Not tested
+            this._clearContents();
+            this._cellNode.set('t', 'b');
+            var vNode = subelement(this._cellNode, 'v');
+            vNode.text = value ? 'true' : 'false';
+        } break;
+        default: {
+            if (value instanceof Date) {
+                this._clearContents();
+                this._cellNode.set('t', 'd');
+                this._cellNode.set('s', '2'); // hack
+                var vNode = subelement(this._cellNode, 'v');
+                vNode.text = ('' + value.toISOString());
+            }
+        } break;
     }
-
     return this;
 };
 
 /**
  * Sets the formula for a cell (with optional precalculated value).
  * @param {string} formula
- * @param {*=} calculatedValue
+ * @param {*} calculatedValue
+ * @param {*} sharedIndex
  * @returns {Cell}
  */
-Cell.prototype.setFormula = function (formula, calculatedValue) {
+Cell.prototype.setFormula = function (formula, calculatedValue, sharedIndex) {
     this._clearContents();
-
-    var fNode = subelement(this._cellNode, "f");
-    fNode.text = formula;
-
-    if (arguments.length > 1) {
-        var vNode = subelement(this._cellNode, "v");
+    var fNode = subelement(this._cellNode, 'f'); // formula node
+    if (formula) {
+        fNode.text = formula;
+    }
+    if (sharedIndex) {
+        // TODO: Check that sharedIndex is unique
+        fNode.set('t', 'shared');
+        fNode.set('si', sharedIndex);
+    }
+    if (calculatedValue) {
+        var vNode = subelement(this._cellNode, 'v'); // value node
         vNode.text = calculatedValue;
     }
-
     return this;
+};
+
+/**
+ * Check if the current cell is a shared formula.
+ * @returns {boolean}
+ */
+Cell.prototype.isSharedFormula = function () {
+    /*
+    <sheetData>
+        <row ...>
+            <c ...>
+                <f ref="F2:F519" si="0" t="shared">C2/B2</f>
+                ...
+            </c>
+        </row>
+    </sheetData>
+    */
+    var fNode = this._cellNode.find('./f');
+    if (!fNode) { // check for formula
+        console.log('fNode not found');
+        return false;
+    }
+    if (!fNode.text.length) { // check for formula content
+        console.log('fNode formula is empty');
+        return false;
+    }
+    if (fNode.get('t') !== 'shared') { // check for type
+        console.log('fNode type not shared');
+        return false;
+    }
+    if (!fNode.get('ref').length) { // check for reference
+        console.log('fNode ref is empty');
+        return false;
+    }
+    if (!fNode.get('si').length) { // check for shared/string index
+        console.log('fNode si is empty');
+        return false;
+    }
+    return true;
+};
+
+/**
+ * Returns a cell with a relative position to the offsets provided.
+ * @param {integer} rowOffset
+ * @param {integer} columnOffset
+ * @returns {Cell}
+ */
+Cell.prototype.getRelativeCell = function (rowOffset, columnOffset) {
+    if (!utils.isInteger(rowOffset)) return null;
+    if (!utils.isInteger(columnOffset)) return null;
+    var relativeRow = this.getRow()+rowOffset;
+    if (relativeRow <= 0) return null;
+    var relativeColumn = this.getColumn()+columnOffset;
+    if (relativeColumn <= 0) return null;
+    return this.getSheet().getCell(relativeRow, relativeColumn);
 };
 
 /**
