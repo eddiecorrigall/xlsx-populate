@@ -79,6 +79,19 @@ Workbook.prototype.output = function () {
     for (var i = 0; i < this.sheets.length; i++) {
         var index = i + 1;
         var sheet = this.sheets[i];
+
+        // Cell nodes <c> must be sorted by address to comply with MS Excel
+        // TODO: is it necessary to sort rows within <sheetData>?
+        var sortByNodeAddress = function (nodeA, nodeB) { //  <c r="A1" ...>...</c>
+            var addressA = nodeA.get('r');
+            var addressB = nodeB.get('r');
+            return addressA.localeCompare(addressB);
+        };
+        var sheetDataRowNodes = sheet._sheetXML.findall('./sheetData/row');
+        sheetDataRowNodes.forEach(function (rowNode) {
+            rowNode._children.sort(sortByNodeAddress);
+        });
+
         this._zip.file("xl/worksheets/sheet" + index + ".xml", sheet._sheetXML.write());
     }
 
