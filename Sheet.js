@@ -102,4 +102,32 @@ Sheet.prototype.getCell = function () {
     return this._cells[address];
 };
 
+/**
+ * Given a row, assign column values to the row for eahc column name and value pair provided.
+ * Example: sheet.setRow(4, { 'A': 'abc', 'D': 123 });
+ */
+Sheet.prototype.setColumnValues = function (row, columnValues) {
+    for (var columnNameOrIndex in columnValues) {
+        var column = null;
+        var value = columnValues[columnNameOrIndex];
+        switch (typeof(columnNameOrIndex)) {
+            case 'string': {
+                column = utils.columnNameToNumber(columnNameOrIndex);
+            } break;
+            case 'number': {
+                if (utils.isInteger(value)) {
+                    column = columnNameOrIndex;
+                }
+            } break;
+        }
+        if (column) {
+            this.getCell(row, column).setValue(value);
+        }
+        else {
+            console.error('Column name or index', columnNameOrIndex);
+            throw new Error('setColumnValues - invalid column name or index passed');
+        }
+    }
+};
+
 module.exports = Sheet;
