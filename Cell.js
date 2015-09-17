@@ -103,9 +103,10 @@ Cell.prototype.setValue = function (value) {
  * @param {string} formula
  * @param {*} calculatedValue
  * @param {*} sharedIndex
+ * @param {Cell Array} sharedRef
  * @returns {Cell}
  */
-Cell.prototype.setFormula = function (formula, calculatedValue, sharedIndex) {
+Cell.prototype.setFormula = function (formula, calculatedValue, sharedIndex, sharedRef) {
     this._clearContents();
     var fNode = subelement(this._cellNode, 'f'); // formula node
     if (formula) {
@@ -115,6 +116,21 @@ Cell.prototype.setFormula = function (formula, calculatedValue, sharedIndex) {
         // TODO: Check that sharedIndex is unique
         fNode.set('t', 'shared');
         fNode.set('si', sharedIndex);
+    }
+    // Example:
+    // [sheet.getCell('B2'), sheet.getCell('B10')] => 'B2:B10'
+    // var cell = sheet.getCell('B2');
+    // [cell, cell.getRelativeCell(10)] => 'B2:B10'
+    if (sharedRef instanceof Array) {
+        if (sharedRef.length === 2) {
+            if ((sharedRef[0] instanceof Cell) && (sharedRef[1] instanceof Cell)) {
+                var sharedRefString = sharedRef
+                    .map(function (c) { return c.getAddress(); })
+                    .join(':')
+                    ;
+                fNode.set('ref', sharedRefString);
+            }
+        }
     }
     if (calculatedValue) {
         var vNode = subelement(this._cellNode, 'v'); // value node

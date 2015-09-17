@@ -59,6 +59,8 @@ cell.setValue(5.6);
 cell.setFormula("SUM(A1:A5)");
 // set shared index at cell
 cell.setFormula(null, null, 0);
+// set shared formula at cell and along 10 rows from the formula position
+cell.setFormula("A2/B2", null, 0, [cell, cell.getRelativeCell(10,0)])
 // at row 5, set value at column A to 'abc' and B to 123
 sheet.setColumnValues(5, {A: "abc", B: 123});
 // extend the existing shared formulas at F2, G2, H2, I2, J2, and K2 along 433 rows
@@ -236,7 +238,7 @@ Gets the cell with either the provided row and column or address.
   * [.getAddress()](#Cell#getAddress) ⇒ <code>string</code>
   * [.getFullAddress()](#Cell#getFullAddress) ⇒ <code>string</code>
   * [.setValue(value)](#Cell#setValue) ⇒ <code>[Cell](#Cell)</code>
-  * [.setFormula(formula, [calculatedValue])](#Cell#setFormula) ⇒ <code>[Cell](#Cell)</code>
+  * [.setFormula(formula, [calculatedValue], [sharedIndex], [sharedRef])](#Cell#setFormula) ⇒ <code>[Cell](#Cell)</code>
 
 <a name="new_Cell_new"></a>
 ### new Cell(sheet, row, column, cellNode)
@@ -286,7 +288,7 @@ Sets the value of the cell.
 | value | <code>\*</code> |
 
 <a name="Cell#setFormula"></a>
-### cell.setFormula(formula, [calculatedValue]) ⇒ <code>[Cell](#Cell)</code>
+### cell.setFormula(formula, [calculatedValue], [sharedIndex], [sharedRef]) ⇒ <code>[Cell](#Cell)</code>
 Sets the formula for a cell (with optional precalculated value).
 
 **Kind**: instance method of <code>[Cell](#Cell)</code>
