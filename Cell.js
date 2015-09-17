@@ -112,7 +112,7 @@ Cell.prototype.setFormula = function (formula, calculatedValue, sharedIndex, sha
     if (formula) {
         fNode.text = formula;
     }
-    if (sharedIndex) {
+    if (utils.isInteger(sharedIndex) && (0 <= sharedIndex)) {
         // TODO: Check that sharedIndex is unique
         fNode.set('t', 'shared');
         fNode.set('si', sharedIndex);
