@@ -8,7 +8,7 @@ var utils = require('./utils'),
 /**
  * Initializes a new Sheet.
  * @param {Workbook} workbook
- * @param {string} name
+ * @param {String} name
  * @param {etree.Element} sheetNode - The node defining the sheet in the workbook.xml.
  * @param {etree.Element} sheetXML
  * @constructor
@@ -30,7 +30,7 @@ Sheet.prototype.getWorkbook = function () {
 
 /**
  * Gets the name of the sheet.
- * @returns {string}
+ * @returns {String}
  */
 Sheet.prototype.getName = function () {
     return this._sheetNode.attrib.name;
@@ -132,8 +132,8 @@ Sheet.prototype.setColumnValues = function (row, columnValues) {
 
 /**
  Given a list of shared formula addresses, extend the formula along the column for a given number of rows.
- @ param {integer} numberOfRows
- @ param {array} sharedFormulaAddresses
+ @ param {Integer} numberOfRows
+ @ param {Array} sharedFormulaAddresses
  */
 Sheet.prototype.setShareFormulaColumns = function (numberOfRows, sharedFormulaAddresses) {
     // Example:

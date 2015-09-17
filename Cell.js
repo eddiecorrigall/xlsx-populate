@@ -102,7 +102,7 @@ Cell.prototype.setValue = function (value) {
  * Sets the formula for a cell (with optional precalculated value).
  * @param {string} formula
  * @param {*} calculatedValue
- * @param {*} sharedIndex
+ * @param {Integer} sharedIndex
  * @param {Cell Array} sharedRef
  * @returns {Cell}
  */
@@ -122,6 +122,7 @@ Cell.prototype.setFormula = function (formula, calculatedValue, sharedIndex, sha
     // var cell = sheet.getCell('B2');
     // [cell, cell.getRelativeCell(10)] => 'B2:B10'
     if (sharedRef instanceof Array) {
+        // TODO: consider moving functionality from Sheet.setShareFormulaColumns here
         if (sharedRef.length === 2) {
             if ((sharedRef[0] instanceof Cell) && (sharedRef[1] instanceof Cell)) {
                 var sharedRefString = sharedRef
