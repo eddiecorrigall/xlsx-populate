@@ -51,6 +51,9 @@ You can also get named cells directly from the Workbook:
 var cell = sheet.getNamedCell("Foo");
 ```
 
+You can select on a range of cells
+var cells = sheet.getCellRange('B2:J6');
+
 ### Setting Cell Contents
 You can set the cell value or formula:
 ```js
@@ -60,11 +63,12 @@ cell.setFormula("SUM(A1:A5)");
 // set shared index at cell
 cell.setFormula(null, null, 0);
 // set shared formula at cell and along 10 rows from the formula position
-cell.setFormula("A2/B2", null, 0, [cell, cell.getRelativeCell(10,0)])
+cell.setFormula("A2/B2", undefined, 0, cell.getAddress() + ':' + cell.getRelativeCell(10,0));
 // at row 5, set value at column A to 'abc' and B to 123
+// this is useful if a loop is used to populate along many rows
 sheet.setColumnValues(5, {A: "abc", B: 123});
-// extend the existing shared formulas at F2, G2, H2, I2, J2, and K2 along 433 rows
-sheet.setShareFormulaColumns(433, ['F2', 'G2', 'H2', 'I2', 'J2', 'K2']);
+// extend the existing shared formula to another cell
+cell.shareFormula(cell.getRelativeCell(433,0));
 ```
 
 ### Serving from Express
