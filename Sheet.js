@@ -5,6 +5,8 @@ var utils = require('./utils'),
     subelement = etree.SubElement,
     Cell = require('./Cell');
 
+var assert = require('assert');
+
 /**
  * Initializes a new Sheet.
  * @param {Workbook} workbook
@@ -60,6 +62,10 @@ Sheet.prototype.getCell = function () {
         address = utils.rowAndColumnToAddress(row, column);
     }
 
+    assert(utils.isInteger(row) && (row > 0), 'Row must be a positive integer');
+    assert(utils.isInteger(column) && (column > 0), 'Column must be a positive integer');
+    assert(typeof address === 'string', 'Address must be of type string');
+
     var getRowNode = function (sheetDataNode, row) {
         var rowNodes = sheetDataNode.findall('./row');
         for (var i = 0; i < rowNodes.length; i++) {
@@ -80,21 +86,17 @@ Sheet.prototype.getCell = function () {
         return null;
     }
 
+    // Fast lookup
+
     if ((address in this._cells) === false) {
         
         var sheetDataNode = this._sheetXML.find('./sheetData');
         
-        var rowNode = getRowNode(sheetDataNode, row);
-        if (!rowNode) {
-            rowNode = subelement(sheetDataNode, 'row');
-            rowNode.set('r', row);
-        }
+        var rowNode = getRowNode(sheetDataNode, row) || subelement(sheetDataNode, 'row');
+        rowNode.set('r', row);
         
-        var cellNode = getCellNode(rowNode, address);
-        if (!cellNode) {
-            cellNode = subelement(rowNode, 'c');
-            cellNode.set('r', address);
-        }
+        var cellNode = getCellNode(rowNode, address) || subelement(rowNode, 'c');
+        cellNode.set('r', address);
 
         this._cells[address] = new Cell(this, row, column, cellNode);
     }
@@ -102,65 +104,70 @@ Sheet.prototype.getCell = function () {
     return this._cells[address];
 };
 
+// sheet.getCellRange('A1:B2') => 
+// sheet.getCellRange(['A1', 'B2']) => 
+// sheet.getCellRange('A1', 'B2') => 
+// sheet.getCellRange(sheet.getCell('A1'), sheet.getCell('B2')) => 
+//  [ this.getCell('A1'), this.getCell('A2'), this.getCell('B1'), this.getCell('B2') ]
+Sheet.prototype.getCellRange = function () {
+    var ref = arguments;
+    if (ref.length === 1) {
+        if (typeof ref[0] === 'string') {
+            ref = ref[0].split(':');
+        }
+        if (ref[0] instanceof Array) {
+            ref = ref[0];
+        }
+    }
+    if (typeof ref[0] === 'string') {
+        ref[0] = this.getCell(ref[0]);
+    }
+    if (typeof ref[1] === 'string') {
+        ref[1] = this.getCell(ref[1]);
+    }
+    assert(ref[0] instanceof Cell, 'Expected first reference to be Cell');
+    assert(ref[1] instanceof Cell, 'Expected second reference to be Cell');
+    // ...
+    var cells = [];
+    var c0 = ref[0].getColumn();
+    var r0 = ref[0].getRow();
+    var c1 = ref[1].getColumn();
+    var r1 = ref[1].getRow();
+    var cMin = Math.min(c0, c1);
+    var cMax = Math.max(c0, c1);
+    var rMin = Math.min(r0, r1);
+    var rMax = Math.max(r0, r1);
+    for (var r = rMin; r <= rMax; r++) {
+        for (var c = cMin; c <= cMax; c++) {
+            cells.push(this.getCell(r, c));
+        }
+    }
+    return cells;
+};
+
 /**
  * Given a row, assign column values to the row for each column name and value pair provided.
- * Example: sheet.setColumnValues(4, { 'A': 'abc', 'D': 123 });
+ * Example: 
+ * sheet.setColumnValues(4, { 'A': 'abc', 'D': 123 });
+ * sheet.setColumnValues(4, { 1: 'abc', 4: 123 });
  */
 Sheet.prototype.setColumnValues = function (row, columnValues) {
     for (var columnNameOrIndex in columnValues) {
-        var column = null;
+        var column = 0;
         var value = columnValues[columnNameOrIndex];
         switch (typeof(columnNameOrIndex)) {
             case 'string': {
                 column = utils.columnNameToNumber(columnNameOrIndex);
             } break;
             case 'number': {
-                if (utils.isInteger(value)) {
-                    column = columnNameOrIndex;
-                }
+                assert(utils.isInteger(columnNameOrIndex), 'Column number must be integer');
+                column = columnNameOrIndex;
+            } break;
+            default: {
+                throw new Error('Column must alphabetical or numerical');
             } break;
         }
-        if (column) {
-            this.getCell(row, column).setValue(value);
-        }
-        else {
-            console.error('Column name or index', columnNameOrIndex);
-            throw new Error('setColumnValues - invalid column name or index passed');
-        }
-    }
-};
-
-/**
- Given a list of shared formula addresses, extend the formula along the column for a given number of rows.
- @ param {Integer} numberOfRows
- @ param {Array} sharedFormulaAddresses
- */
-Sheet.prototype.setShareFormulaColumns = function (numberOfRows, sharedFormulaAddresses) {
-    // Example:
-    // sheet.setShareFormulaColumns(433, ['F2', 'G2', 'H2', 'I2', 'J2', 'K2']);
-    if (!sharedFormulaAddresses) {
-        throw new Error('setShareFormulaColumns - requires sharedFormulaAddresses');
-    }
-    if ((utils.isInteger(numberOfRows) && (0 < numberOfRows)) === false) {
-        throw new Error('setShareFormulaColumns - numberOfRows - must be a positive integer');
-    }
-    for (var a = 0; a < sharedFormulaAddresses.length; a++) {
-        var sharedFormulaAddress = sharedFormulaAddresses[a];
-        var sharedFormulaCell = this.getCell(sharedFormulaAddress);
-        if (!sharedFormulaCell.isSharedFormula()) {
-            console.log(JSON.stringify(sharedFormulaCell._cellNode));
-            throw new Error('setShareFormulaColumns - not a shared formula');
-        }
-        var fNode = sharedFormulaCell._cellNode.find('./f');
-        var sharedIndex = fNode.get('si');
-        var lastSharedFormulaCell = null;
-        for (var r = 1; r < numberOfRows; r++) {
-            var lastSharedFormulaCell = sharedFormulaCell.getRelativeCell(r, 0);
-            lastSharedFormulaCell.setFormula(null, null, sharedIndex);
-        }
-        var range = [sharedFormulaAddress, lastSharedFormulaCell.getAddress()];
-        var ref = range.join(':');
-        fNode.set('ref', ref);
+        this.getCell(row, column).setValue(value);
     }
 };
 

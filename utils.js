@@ -42,7 +42,7 @@ module.exports = {
      * @param {string} name
      * @returns {number}
      */
-    columnNameToNumber: function (name) {
+    /*columnNameToNumber: function (name) {
         if (!name || typeof name !== "string") return;
 
         name = name.toUpperCase();
@@ -53,6 +53,17 @@ module.exports = {
         }
 
         return sum;
+    },*/
+    columnNameToNumber: function (name) {
+        if (typeof name !== 'string') return;
+        if (/^[a-zA-Z]+$/.test(name) == false) return; // Check that it is completely alphabetical
+        var offset = 'A'.charCodeAt(0);
+        return name
+            .toUpperCase()
+            .split('')
+            .map(function (currentValue) { return currentValue.charCodeAt(0)-offset+1; })
+            .reduce(function (previousValue, currentValue) { return 26*previousValue+currentValue; })
+            ;
     },
 
     /**

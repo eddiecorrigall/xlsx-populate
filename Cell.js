@@ -4,6 +4,8 @@ var etree = require('elementtree'),
     subelement = etree.SubElement,
     utils = require('./utils');
 
+var assert = require('assert');
+
 /**
  * Initializes a new Cell.
  * @param {Sheet} sheet
@@ -109,33 +111,20 @@ Cell.prototype.setValue = function (value) {
 Cell.prototype.setFormula = function (formula, calculatedValue, sharedIndex, sharedRef) {
     this._clearContents();
     var fNode = subelement(this._cellNode, 'f'); // formula node
-    if (formula) {
+    if (typeof formula === 'string') {
         fNode.text = formula;
+    }
+    if (calculatedValue !== undefined) {
+        var vNode = subelement(this._cellNode, 'v'); // value node
+        vNode.text = calculatedValue;
     }
     if (utils.isInteger(sharedIndex) && (0 <= sharedIndex)) {
         // TODO: Check that sharedIndex is unique
         fNode.set('t', 'shared');
-        fNode.set('si', sharedIndex);
+        fNode.set('si', '' + sharedIndex);
     }
-    // Example:
-    // [sheet.getCell('B2'), sheet.getCell('B10')] => 'B2:B10'
-    // var cell = sheet.getCell('B2');
-    // [cell, cell.getRelativeCell(10)] => 'B2:B10'
-    if (sharedRef instanceof Array) {
-        // TODO: consider moving functionality from Sheet.setShareFormulaColumns here
-        if (sharedRef.length === 2) {
-            if ((sharedRef[0] instanceof Cell) && (sharedRef[1] instanceof Cell)) {
-                var sharedRefString = sharedRef
-                    .map(function (c) { return c.getAddress(); })
-                    .join(':')
-                    ;
-                fNode.set('ref', sharedRefString);
-            }
-        }
-    }
-    if (calculatedValue) {
-        var vNode = subelement(this._cellNode, 'v'); // value node
-        vNode.text = calculatedValue;
+    if (typeof sharedRef === 'string') {
+        fNode.set('ref', sharedRef);
     }
     return this;
 };
@@ -144,7 +133,8 @@ Cell.prototype.setFormula = function (formula, calculatedValue, sharedIndex, sha
  * Check if the current cell is a shared formula.
  * @returns {boolean}
  */
-Cell.prototype.isSharedFormula = function () {
+Cell.prototype.isSharedFormula = function (isSource) {
+    isSource = isSource || false;
     /*
     <sheetData>
         <row ...>
@@ -157,26 +147,91 @@ Cell.prototype.isSharedFormula = function () {
     */
     var fNode = this._cellNode.find('./f');
     if (!fNode) { // check for formula
-        console.log('fNode not found');
+        console.log(this.getAddress(), 'fNode not found', fNode);
         return false;
     }
     if (!fNode.text.length) { // check for formula content
-        console.log('fNode formula is empty');
+        console.log(this.getAddress(), 'fNode formula is empty', fNode.text);
         return false;
     }
-    if (fNode.get('t') !== 'shared') { // check for type
-        console.log('fNode type not shared');
+    var fNodeType = fNode.get('t');
+    if (fNodeType !== 'shared') { // check for type
+        console.log(this.getAddress(), 'fNode type not shared', fNodeType);
         return false;
     }
-    if (!fNode.get('ref').length) { // check for reference
-        console.log('fNode ref is empty');
+    var fNodeSharedIndex = fNode.get('si');
+    if (!fNodeSharedIndex.length) { // check for shared/string index
+        console.log(this.getAddress(), 'fNode si is empty', fNodeSharedIndex);
         return false;
     }
-    if (!fNode.get('si').length) { // check for shared/string index
-        console.log('fNode si is empty');
+    var fNodeRef = fNode.get('ref');
+    if (isSource && !fNodeRef.length) { // check for reference
+        console.log(this.getAddress(), 'fNode ref is empty', fNodeRef);
         return false;
     }
     return true;
+};
+
+Cell.prototype.hasSameRow = function () {
+    var otherCell = (arguments[0] instanceof Cell)
+        ? arguments[0]
+        : this.getSheet().getCell(arguments)
+        ;
+    return this.getRow() === otherCell.getRow();
+};
+
+Cell.prototype.hasSameColumn = function () {
+    var otherCell = (arguments[0] instanceof Cell)
+        ? arguments[0]
+        : this.getSheet().getCell(arguments)
+        ;
+    return this.getColumn() === otherCell.getColumn();
+};
+
+Cell.prototype.isEqual = function () {
+    var otherCell = (arguments[0] instanceof Cell)
+        ? arguments[0]
+        : this.getSheet().getCell(arguments)
+        ;
+    return this.hasSameRow(otherCell) && this.hasSameColumn(otherCell);
+}
+
+// Examples:
+// sheet.getCell('C1').setSharedFormula('C3')
+// sheet.getCell('A3').setSharedFormula('C3')
+Cell.prototype.shareFormula = function (lastSharedCell) {
+    assert(this.isSharedFormula(true), 'Expected cell to be a shared formula');
+    var fNode = this._cellNode.find('./f');
+    assert(fNode !== null, 'Expected <f> node to be defined');
+    var sharedIndex = parseInt(fNode.get('si'));
+    assert(utils.isInteger(sharedIndex) && (0 <= sharedIndex), 'Expected shared index to be a non-negative integer');
+    // ...
+    if (typeof lastSharedCell === 'string') {
+        lastSharedCell = this.getCell(lastSharedCell);
+    }
+    assert(lastSharedCell instanceof Cell, 'Expected shared reference to be a cell');
+    // ...
+    if (this.hasSameRow(lastSharedCell)) {
+        for (var c = 1+this.getColumn(); c <= lastSharedCell.getColumn(); c++) {
+            var cell = this.getSheet().getCell(this.getRow(), c);
+            cell.setFormula(undefined, undefined, sharedIndex);
+        }
+    }
+    else if (this.hasSameColumn(lastSharedCell)) {
+        for (var r = 1+this.getRow(); r <= lastSharedCell.getRow(); r++) {
+            var cell = this.getSheet().getCell(r, this.getColumn());
+            assert(cell instanceof Cell, 'Expected valid cell');
+            cell.setFormula(undefined, undefined, sharedIndex);
+        }
+    }
+    else {
+        throw new Error('Expected last shared forumla cell to align either row-wise or column-wise with shared formula source');
+    }
+    // ...
+    var sharedRef = this.getAddress() + ':' + lastSharedCell.getAddress();
+    fNode.set('ref', sharedRef);
+    // ...
+    return this;
 };
 
 /**
@@ -188,11 +243,11 @@ Cell.prototype.isSharedFormula = function () {
 Cell.prototype.getRelativeCell = function (rowOffset, columnOffset) {
     if (!utils.isInteger(rowOffset)) return null;
     if (!utils.isInteger(columnOffset)) return null;
-    var relativeRow = this.getRow()+rowOffset;
-    if (relativeRow <= 0) return null;
-    var relativeColumn = this.getColumn()+columnOffset;
-    if (relativeColumn <= 0) return null;
-    return this.getSheet().getCell(relativeRow, relativeColumn);
+    var absoluteRow = this.getRow()+rowOffset;
+    assert(absoluteRow >= 0, 'Expected relative row to be a non-negative');
+    var absoluteColumn = this.getColumn()+columnOffset;
+    assert(absoluteColumn >= 0, 'Expected relative column to be a non-negative');
+    return this.getSheet().getCell(absoluteRow, absoluteColumn);
 };
 
 /**
@@ -204,7 +259,6 @@ Cell.prototype._clearContents = function () {
     this._cellNode.getchildren().forEach(function (childNode) {
         self._cellNode.remove(childNode);
     });
-
     delete this._cellNode.attrib.t;
 };
 

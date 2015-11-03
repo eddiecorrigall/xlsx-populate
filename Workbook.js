@@ -6,6 +6,8 @@ var fs = require('fs'),
     JSZip = require('jszip'),
     Sheet = require('./Sheet');
 
+var assert = require('assert');
+
 /**
  * Initializes a new Workbook.
  * @param {Buffer} data
@@ -81,15 +83,22 @@ Workbook.prototype.output = function () {
         var sheet = this.sheets[i];
 
         // Cell nodes <c> must be sorted by address to comply with MS Excel
-        // TODO: is it necessary to sort rows within <sheetData>?
-        var sortByNodeAddress = function (nodeA, nodeB) { //  <c r="A1" ...>...</c>
+        // TODO:
+        // * is it necessary to sort rows within <sheetData>?
+        // * determine the <row> attribute "span" and update it
+        var sortRowByColumn = function (nodeA, nodeB) {
             var addressA = nodeA.get('r');
             var addressB = nodeB.get('r');
-            return addressA.localeCompare(addressB);
+            var refA = utils.addressToRowAndColumn(addressA);
+            var refB = utils.addressToRowAndColumn(addressB);
+            assert(refA.row == refB.row, 'Requires uniform column attribute in child node <c>');
+            if (refA.column == refB.column) return 0;
+            if (refA.column < refB.column) return -1;
+            return 1;
         };
         var sheetDataRowNodes = sheet._sheetXML.findall('./sheetData/row');
         sheetDataRowNodes.forEach(function (rowNode) {
-            rowNode._children.sort(sortByNodeAddress);
+            rowNode._children.sort(sortRowByColumn);
         });
 
         this._zip.file("xl/worksheets/sheet" + index + ".xml", sheet._sheetXML.write());
