@@ -43,6 +43,9 @@ var cell = sheet.getCell("A5");
 
 // Get cell "A5" by row and column.
 var cell = sheet.getCell(5, 1);
+
+// Get cell "A5" by using its relative position to "A1"
+var cell = sheet.getCell(1, 1).getRelativeCell(4, 0);
 ```
 
 You can also get named cells directly from the Workbook:
@@ -52,7 +55,9 @@ var cell = sheet.getNamedCell("Foo");
 ```
 
 You can select on a range of cells
+```js
 var cells = sheet.getCellRange('B2:J6');
+```
 
 ### Setting Cell Contents
 You can set the cell value or formula:
@@ -67,7 +72,7 @@ cell.setFormula("A2/B2", undefined, 0, cell.getAddress() + ':' + cell.getRelativ
 // at row 5, set value at column A to 'abc' and B to 123
 // this is useful if a loop is used to populate along many rows
 sheet.setColumnValues(5, {A: "abc", B: 123});
-// extend the existing shared formula to another cell
+// extend the existing shared formula row or column-wise to another cell
 cell.shareFormula(cell.getRelativeCell(433,0));
 ```
 
