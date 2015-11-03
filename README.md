@@ -66,7 +66,7 @@ cell.setValue("foo");
 cell.setValue(5.6);
 cell.setFormula("SUM(A1:A5)");
 // set shared index at cell
-cell.setFormula(null, null, 0);
+cell.setFormula(undefined, undefined, 0);
 // set shared formula at cell and along 10 rows from the formula position
 cell.setFormula("A2/B2", undefined, 0, cell.getAddress() + ':' + cell.getRelativeCell(10,0));
 // at row 5, set value at column A to 'abc' and B to 123
