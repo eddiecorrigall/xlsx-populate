@@ -207,7 +207,7 @@ Creates a Workbook from the file with the given path synchronously.
   * [.getWorkbook()](#Sheet#getWorkbook) ⇒ <code>[Workbook](#Workbook)</code>
   * [.getName()](#Sheet#getName) ⇒ <code>string</code>
   * [.getCell()](#Sheet#getCell) ⇒ <code>[Cell](#Cell)</code>
-  * [.getCellRange()](#Sheet#getCellRange) ⇒ <code>[Cell array](#Cell)</code>
+  * [.getCellRange()](#Sheet#getCellRange) ⇒ <code>array</code>
   * [.setColumnValues()](#Sheet#setColumnValues)
 
 <a name="new_Sheet_new"></a>
@@ -237,12 +237,19 @@ Gets the name of the sheet.
 Gets the cell with either the provided row and column or address.
 
 <a name="Sheet#getCellRange"></a>
-### sheet.getCellRange() ⇒ <code>[Cell Array](#CellArray)</code>
+### sheet.getCellRange() ⇒ <code>array</code>
 Gets the cells within a given address range bounded by two cells.
 
 <a name="Sheet#setColumnValues"></a>
 ### sheet.setColumnValues(row, dictionary<ColumnName, ColumnValue>)
 Sets the column values described in the dictionary on a specific row.
+
+**Example**
+```js
+for (var row = 0; row < 5; row++) {
+  mySheet.setColumnValues(row, { 'A': 123.6, 'B': 'abc', 'C': 111 });
+}
+```
 
 **Kind**: instance method of <code>[Sheet](#Sheet)</code>
 <a name="Cell"></a>
