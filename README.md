@@ -238,7 +238,7 @@ Gets the cell with either the provided row and column or address.
 
 <a name="Sheet#getCellRange"></a>
 ### sheet.getCellRange() ⇒ <code>array</code>
-Gets the cells within a given address range bounded by two cells.
+Gets the cells within a given address range bounded by two cells. Returns a <code>[Cell](#Cell)</code> array.
 
 <a name="Sheet#setColumnValues"></a>
 ### sheet.setColumnValues(row, dictionary<ColumnName, ColumnValue>)
