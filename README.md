@@ -246,8 +246,13 @@ Sets the column values described in the dictionary on a specific row.
 
 **Example**
 ```js
-for (var row = 0; row < 5; row++) {
-  mySheet.setColumnValues(row, { 'A': 123.6, 'B': 'abc', 'C': 111 });
+var data = [
+  {'A':1, 'B':'a', 'C':0.1},
+  {'A':2, 'B':'b', 'C':0.2},
+  {'A':3, 'B':'c', 'C':0.3},
+];
+for (var row = 0; row < data.length; row++) {
+  mySheet.setColumnValues(row, data[row]);
 }
 ```
 
