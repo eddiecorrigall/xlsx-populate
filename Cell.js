@@ -150,7 +150,7 @@ Cell.prototype.isSharedFormula = function (isSource) {
         console.log(this.getAddress(), 'fNode not found', fNode);
         return false;
     }
-    if (!fNode.text.length) { // check for formula content
+    if (isSource && !fNode.text.length) { // check for formula content
         console.log(this.getAddress(), 'fNode formula is empty', fNode.text);
         return false;
     }
@@ -188,7 +188,7 @@ Cell.prototype.hasSameColumn = function () {
     return this.getColumn() === otherCell.getColumn();
 };
 
-Cell.prototype.isEqual = function () {
+Cell.prototype.isSame = function () {
     var otherCell = (arguments[0] instanceof Cell)
         ? arguments[0]
         : this.getSheet().getCell(arguments)
@@ -230,8 +230,6 @@ Cell.prototype.shareFormula = function (lastSharedCell) {
     // ...
     var sharedRef = this.getAddress() + ':' + lastSharedCell.getAddress();
     fNode.set('ref', sharedRef);
-    // ...
-    return this;
 };
 
 /**
