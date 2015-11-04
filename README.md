@@ -207,6 +207,8 @@ Creates a Workbook from the file with the given path synchronously.
   * [.getWorkbook()](#Sheet#getWorkbook) ⇒ <code>[Workbook](#Workbook)</code>
   * [.getName()](#Sheet#getName) ⇒ <code>string</code>
   * [.getCell()](#Sheet#getCell) ⇒ <code>[Cell](#Cell)</code>
+  * [.getCellRange()](#Sheet#getCellRange) ⇒ <code>[Cell Array](#CellArray)</code>
+  * [.setColumnValues()](#Sheet#setColumnValues)
 
 <a name="new_Sheet_new"></a>
 ### new Sheet(workbook, name, sheetNode, sheetXML)
@@ -234,6 +236,14 @@ Gets the name of the sheet.
 ### sheet.getCell() ⇒ <code>[Cell](#Cell)</code>
 Gets the cell with either the provided row and column or address.
 
+<a name="Sheet#getCellRange"></a>
+### sheet.getCellRange() ⇒ <code>[Cell Array](#CellArray)</code>
+Gets the cells within a given address range bounded by two cells.
+
+<a name="Sheet#setColumnValues"></a>
+### sheet.setColumnValues(row, dictionary<ColumnName, ColumnValue>)
+Sets the column values described in the dictionary on a specific row.
+
 **Kind**: instance method of <code>[Sheet](#Sheet)</code>
 <a name="Cell"></a>
 ## Cell
@@ -248,6 +258,12 @@ Gets the cell with either the provided row and column or address.
   * [.getFullAddress()](#Cell#getFullAddress) ⇒ <code>string</code>
   * [.setValue(value)](#Cell#setValue) ⇒ <code>[Cell](#Cell)</code>
   * [.setFormula(formula, [calculatedValue], [sharedIndex], [sharedRef])](#Cell#setFormula) ⇒ <code>[Cell](#Cell)</code>
+  * [.isSharedFormula([isSource])](#Cell#isSharedFormula) ⇒ <code>boolean</code>
+  * [.hasSameRow()](#Cell#hasSameRow) ⇒ <code>boolean</code>
+  * [.hasSameColumn()](#Cell#hasSameColumn) ⇒ <code>boolean<code>
+  * [.isSame()](#Cell#isSame) ⇒ <code>boolean<code>
+  * [.shareFormula(lastSharedCell)](#Cell#shareFormula)
+  * [.getRelativeCell(row, column)](#Cell#getRelativeCell) ⇒ <code>[Cell](#Cell)</code>
 
 <a name="new_Cell_new"></a>
 ### new Cell(sheet, row, column, cellNode)
@@ -306,3 +322,40 @@ Sets the formula for a cell (with optional precalculated value).
 | --- | --- |
 | formula | <code>string</code> |
 | [calculatedValue] | <code>\*</code> |
+| [sharedIndex] | <code>integer</code> |
+| [sharedRef] | <code>string</code> |
+
+<a name="Cell#isSharedFormula"></a>
+### cell.isSharedFormula([isSource]) ⇒ <code>boolean</code>
+
+**Kind**: instance method of <code>[Cell](#Cell)</code>
+
+| Param | Type | Desc
+| --- | --- | --- |
+| [isSource] | <code>boolean</code> | If true, test if the formula is the source: it has formula content and sets a reference range |
+
+<a name="Cell#hasSameRow"></a>
+### cell.hasSameRow() ⇒ <code>boolean</code>
+
+**Kind**: instance method of <code>[Cell](#Cell)</code>
+
+<a name="Cell#hasSameColumn"></a>
+### cell.hasSameColumn() ⇒ <code>boolean</code>
+
+**Kind**: instance method of <code>[Cell](#Cell)</code>
+
+<a name="Cell#isSame"></a>
+### cell.isSame() ⇒ <code>boolean</code>
+
+**Kind**: instance method of <code>[Cell](#Cell)</code>
+
+<a name="Cell#shareFormula"></a>
+### cell.sharedFormula(lastSharedCell)
+
+<a name="Cell#getRelativeCell"></a>
+### cell.getRelativeCell(row, column) ⇒ <code>[Cell](#Cell)</code>
+
+| Param | Type |
+| --- | --- |
+| row | <code>integer</code> |
+| column | <code>integer</code> |
