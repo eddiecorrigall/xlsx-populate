@@ -207,7 +207,7 @@ Creates a Workbook from the file with the given path synchronously.
   * [.getWorkbook()](#Sheet#getWorkbook) ⇒ <code>[Workbook](#Workbook)</code>
   * [.getName()](#Sheet#getName) ⇒ <code>string</code>
   * [.getCell()](#Sheet#getCell) ⇒ <code>[Cell](#Cell)</code>
-  * [.getCellRange()](#Sheet#getCellRange) ⇒ <code>[Cell Array](#CellArray)</code>
+  * [.getCellRange()](#Sheet#getCellRange) ⇒ <code>[Cell array](#Cell)</code>
   * [.setColumnValues()](#Sheet#setColumnValues)
 
 <a name="new_Sheet_new"></a>
@@ -260,8 +260,8 @@ Sets the column values described in the dictionary on a specific row.
   * [.setFormula(formula, [calculatedValue], [sharedIndex], [sharedRef])](#Cell#setFormula) ⇒ <code>[Cell](#Cell)</code>
   * [.isSharedFormula([isSource])](#Cell#isSharedFormula) ⇒ <code>boolean</code>
   * [.hasSameRow()](#Cell#hasSameRow) ⇒ <code>boolean</code>
-  * [.hasSameColumn()](#Cell#hasSameColumn) ⇒ <code>boolean<code>
-  * [.isSame()](#Cell#isSame) ⇒ <code>boolean<code>
+  * [.hasSameColumn()](#Cell#hasSameColumn) ⇒ <code>boolean</code>
+  * [.isSame()](#Cell#isSame) ⇒ <code>boolean</code>
   * [.shareFormula(lastSharedCell)](#Cell#shareFormula)
   * [.getRelativeCell(row, column)](#Cell#getRelativeCell) ⇒ <code>[Cell](#Cell)</code>
 
