@@ -193,7 +193,10 @@ Cell.prototype.isSame = function () {
         ? arguments[0]
         : this.getSheet().getCell(arguments)
         ;
-    return this.hasSameRow(otherCell) && this.hasSameColumn(otherCell);
+    if (!this.hasSameRow(otherCell)) return false;
+    if (!this.hasSameColumn(otherCell)) return false;
+    if (this.getSheet().getName() !== otherCell.getSheet().getName()) return false;
+    return true;
 }
 
 // Examples:
