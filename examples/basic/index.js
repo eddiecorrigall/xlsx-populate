@@ -1,6 +1,6 @@
 "use strict";
 
-var Workbook = require('../../lib/Workbook');
+var Workbook = require('../../');
 
 // Load the input workbook from file.
 var workbook = Workbook.fromBlankSync();
@@ -9,4 +9,4 @@ var workbook = Workbook.fromBlankSync();
 workbook.getSheet("Sheet1").getCell("A1").setValue("This is neat!");
 
 // Write to file.
-workbook.toFileSync("./out.xlsx");
+workbook.toFileSync(__dirname + "/out.xlsx");

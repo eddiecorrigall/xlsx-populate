@@ -1,8 +1,8 @@
 "use strict";
 
-var xlsx = require('../../lib/Workbook');
+var Workbook = require('../../');
 
-var workbook = xlsx.fromFileSync(__dirname + '/template.xlsx');
+var workbook = Workbook.fromFileSync(__dirname + '/template.xlsx');
 var sheet = workbook.getSheet('ClickThroughRateSheet');
 
 var clicks = sheet.getCell('B3');
