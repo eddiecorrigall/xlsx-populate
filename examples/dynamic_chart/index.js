@@ -1,6 +1,8 @@
-var xlsx = require('./');
+"use strict";
 
-var workbook = xlsx.fromFileSync('./template.xlsx');
+var xlsx = require('../../lib/Workbook');
+
+var workbook = xlsx.fromFileSync(__dirname + '/template.xlsx');
 var sheet = workbook.getSheet('ClickThroughRateSheet');
 
 var clicks = sheet.getCell('B3');
@@ -18,4 +20,4 @@ while (r < 10) {
 
 ctr.shareFormula(ctr.getRelativeCell(r-1, 0));
 
-workbook.toFileSync('./output.xlsx');
+workbook.toFileSync(__dirname + '/out.xlsx');
