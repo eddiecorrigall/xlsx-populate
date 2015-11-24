@@ -63,10 +63,10 @@ cell.setFormula("SUM(A1:A5)");
 You can share a formula at a given cell, along a row or column:
 ```js
 // Share formula at A3 along row ending with C3
-sheet.getCell('A3').setSharedFormula('C3');
+sheet.getCell('A3').shareFormulaUntil('C3');
 
 // Share formula at C1 along column ending with C3
-sheet.getCell('C1').setSharedFormula('C3');
+sheet.getCell('C1').shareFormulaUntil('C3');
 ```
 
 ### Get Range of Cells
