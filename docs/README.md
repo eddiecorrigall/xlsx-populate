@@ -59,6 +59,31 @@ cell.setValue(5.6);
 cell.setFormula("SUM(A1:A5)");
 ```
 
+### Share Formula with Cells
+You can share a formula at a given cell, along a row or column:
+```js
+sheet.getCell('A3').setSharedFormula('C3'); // Share formula at A3 along row ending with C3
+sheet.getCell('C1').setSharedFormula('C3'); // Share formula at C1 along column ending with C3
+```
+
+### Get Range of Cells
+You can get a region of cells:
+```js
+sheet.getCellRange('A1:B2')
+sheet.getCellRange(['A1', 'B2'])
+sheet.getCellRange('A1', 'B2')
+sheet.getCellRange(sheet.getCell('A1'), sheet.getCell('B2'))
+// Returns:
+// [ sheet.getCell('A1'), sheet.getCell('A2'), sheet.getCell('B1'), sheet.getCell('B2') ]
+```
+
+### Set Range of Values
+You can set multiple values along a row:
+```js
+sheet.setColumnValues(4, { 'A': 'abc', 'D': 123 }); // Operate on row 4, set values at A4 and D4
+sheet.setColumnValues(4, { 1: 'abc', 4: 123 }); // Same operation
+```
+
 ### Serving from Express
 You can serve the workbook with [express](http://expressjs.com/) with a route like this:
 ```js
