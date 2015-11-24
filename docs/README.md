@@ -66,6 +66,7 @@ sheet.setColumnValues(4, { 'A': 'abc', 'D': 123 });
 
 // Same operation
 sheet.setColumnValues(4, { 1: 'abc', 4: 123 });
+```
 
 ### Share Formula with Cells
 You can share a formula at a given cell, along a row or column:
