@@ -111,12 +111,16 @@ describe('Randomly populated sheet', function () {
         });
     });
     it('is stored in order', function () {
+        /*
+        // Writing to file maynot be a good idea when testing
         // Write to temporary file
         var timestamp = (new Date()).getTime();
         var xlsxPath = __dirname + '/' + timestamp + '.xlsx';
         workbook.toFileSync(xlsxPath); // You should be able to open this file in MS Excel
         // Reload
         workbook = Workbook.fromFileSync(xlsxPath);
+        */
+        workbook = new Workbook(workbook.output());
         sheet = workbook.getSheet(0);
         // Check order
         var sheetDataNode = sheet._sheetXML.find('./sheetData');
@@ -124,7 +128,7 @@ describe('Randomly populated sheet', function () {
         var lastRowNumber = 0;
         var rowNodes = sheetDataNode.findall('./row');
         rowNodes.forEach(function (rowNode) {
-            var rowNumber = parseInt(rowNode.get('r')); // NaN
+            var rowNumber = parseInt(rowNode.get('r')); // Don't forget to check for NaN
             expect(isNaN(rowNumber)).toBe(false);
             expect(rowNumber).toBeGreaterThan(lastRowNumber);
             lastRowNumber = rowNumber;
