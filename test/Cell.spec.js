@@ -117,6 +117,7 @@ describe('Randomly populated sheet', function () {
         workbook.toFileSync(xlsxPath); // You should be able to open this file in MS Excel
         // Reload
         workbook = Workbook.fromFileSync(xlsxPath);
+        sheet = workbook.getSheet(0);
         // Check order
         var sheetDataNode = sheet._sheetXML.find('./sheetData');
         // ...
