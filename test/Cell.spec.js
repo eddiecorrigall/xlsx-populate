@@ -134,7 +134,7 @@ describe('Randomly populated sheet', function () {
                 var address = cNode.get('r');
                 expect(address).toBeDefined();
                 var ref = utils.addressToRowAndColumn(address);
-                expect(ref.row).tobe(rowNumber);
+                expect(ref.row).toBe(rowNumber);
                 expect(ref.column).toBeGreaterThan(lastColumnNumber);
                 lastColumnNumber = ref.column;
             });
