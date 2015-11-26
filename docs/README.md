@@ -16,10 +16,10 @@ Here is a basic example:
 var Workbook = require('xlsx-populate');
 
 // Load the input workbook from file.
-var workbook = Workbook.fromFileSync("./Book1.xlsx");
+var workbook = Workbook.fromBlankSync();
 
 // Modify the workbook.
-workbook.getSheet("Sheet1").getCell("A1").setValue("This is neat!");
+workbook.getSheet(0).getCell("A1").setValue("This is neat!");
 
 // Write to file.
 workbook.toFileSync("./out.xlsx");
