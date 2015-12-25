@@ -9,7 +9,8 @@ var jasmine = require('gulp-jasmine');
 
 var LIB = 'lib/*.js';
 var TEST = 'test/*.js';
-var SRC = [LIB, TEST];
+var EXAMPLES = 'examples/*/*.js';
+var SRC = [LIB, TEST, EXAMPLES];
 
 gulp.task('jshint', function () { // linting
 	return gulp
@@ -41,7 +42,7 @@ gulp.task('test', ['jshint', 'jscs'], function () {
 });
 
 gulp.task('watch', function () {
-	gulp.watch([SRC, TEST], ['test']);
+	gulp.watch(SRC, ['test']);
 });
 
 gulp.task('default', ['watch']);
