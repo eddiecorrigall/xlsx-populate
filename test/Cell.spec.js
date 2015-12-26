@@ -85,7 +85,7 @@ describe('Sheet', function () {
             var upperCaseCell = sheet.getCell('A1');
             var lowerCaseCell = sheet.getCell('a1');
             expect(upperCaseCell.getFullAddress()).toBe(lowerCaseCell.getFullAddress());
-            A1.setValue(Math.random());
+            upperCaseCell.setValue(Math.random());
             var upperCaseVNode = upperCaseCell._cellNode.find('./v');
             var lowerCaseVNode = lowerCaseCell._cellNode.find('./v');
             expect(upperCaseVNode).not.toBeNull('A1 value node should not be null');
