@@ -74,6 +74,27 @@ describe("Cell", function () {
     });
 });
 
+describe('Sheet', function () {
+    var workbook, sheet;
+    beforeEach(function () {
+        workbook = Workbook.fromBlankSync();
+        sheet = workbook.getSheet(0);
+    });
+    describe('getCell', function () {
+        it('is case insensitive', function () {
+            var A1 = sheet.getCell('A1');
+            var a1 = sheet.getCell('a1');
+            expect(A1.getFullAddress()).toBe(a1.getFullAddress());
+            A1.setValue(Math.random());
+            var A1_vNode = A1._cellNode.find('./v');
+            var a1_vNode = a1._cellNode.find('./v');
+            expect(A1_vNode).not.toBeNull('A1 value node should not be null');
+            expect(a1_vNode).not.toBeNull('a1 value node should not be null');
+            expect(A1_vNode.text).toBe(a1_vNode.text);
+        });
+    });
+});
+
 describe('Randomly populated sheet', function () {
     var MAX_ROW = 100;
     var MAX_COLUMN = 100;
