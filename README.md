@@ -326,6 +326,8 @@ Gets the name of the sheet.
 <a name="Sheet+getCell"></a>
 ### sheet.getCell() ⇒ <code>[Cell](#Cell)</code>
 Gets the cell with either the provided row and column or address.
+If passed nothing, then null is returned.
+If passed a Cell, then the Cell is returned.
 
 **Kind**: instance method of <code>[Sheet](#Sheet)</code>  
 <a name="Sheet+getCellRange"></a>
