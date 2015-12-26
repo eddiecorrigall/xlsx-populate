@@ -82,15 +82,15 @@ describe('Sheet', function () {
     });
     describe('getCell', function () {
         it('is case insensitive', function () {
-            var A1 = sheet.getCell('A1');
-            var a1 = sheet.getCell('a1');
-            expect(A1.getFullAddress()).toBe(a1.getFullAddress());
+            var upperCaseCell = sheet.getCell('A1');
+            var lowerCaseCell = sheet.getCell('a1');
+            expect(upperCaseCell.getFullAddress()).toBe(lowerCaseCell.getFullAddress());
             A1.setValue(Math.random());
-            var A1_vNode = A1._cellNode.find('./v');
-            var a1_vNode = a1._cellNode.find('./v');
-            expect(A1_vNode).not.toBeNull('A1 value node should not be null');
-            expect(a1_vNode).not.toBeNull('a1 value node should not be null');
-            expect(A1_vNode.text).toBe(a1_vNode.text);
+            var upperCaseVNode = upperCaseCell._cellNode.find('./v');
+            var lowerCaseVNode = lowerCaseCell._cellNode.find('./v');
+            expect(upperCaseVNode).not.toBeNull('A1 value node should not be null');
+            expect(lowerCaseVNode).not.toBeNull('a1 value node should not be null');
+            expect(upperCaseVNode.text).toBe(lowerCaseVNode.text);
         });
     });
 });
