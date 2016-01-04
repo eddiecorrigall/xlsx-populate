@@ -63,6 +63,24 @@ describe("Cell", function () {
     describe("setFormula", function () {
     });
 
+    describe("isSharedFormula", function () {
+    });
+
+    describe("hasSameRow", function () {
+    });
+
+    describe("hasSameColumn", function () {
+    });
+
+    describe("isSame", function () {
+    });
+
+    describe("shareFormulaUntil", function () {
+    });
+
+    describe("getRelativeCell", function () {
+    });
+
     describe("_clearContents", function () {
         it("should clear the node contents", function () {
             expect(cell._cellNode.findall('*').length).toBe(1);

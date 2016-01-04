@@ -110,4 +110,10 @@ describe('Sheet', function () { // Class
             });
         });
     });
+
+    describe("getCellRange", function () {
+    });
+
+    describe("setValues", function () {
+    });
 });
