@@ -116,14 +116,20 @@ describe('Sheet', function () { // Class
             var stringRange = sheet.getCellRange('A1:C3');
             var stringArrayRange = sheet.getCellRange(['A1', 'C3']);
             var cellArrayRange = sheet.getCellRange([sheet.getCell('A1'), sheet.getCell('C3')]);
+            var stringArgumentsRange = sheet.getCellRange('A1', 'C3');
+            var cellArgumentsRange = sheet.getCellRange(sheet.getCell('A1'), sheet.getCell('C3'));
             // ...
             expect(stringRange instanceof Array).toBe(true);
             expect(stringArrayRange instanceof Array).toBe(true);
             expect(cellArrayRange instanceof Array).toBe(true);
+            expect(stringArgumentsRange instanceof Array).toBe(true);
+            expect(cellArgumentsRange instanceof Array).toBe(true);
             // ...
             expect(stringRange.length).toBe(9);
             expect(stringArrayRange.length).toBe(9);
             expect(cellArrayRange.length).toBe(9);
+            expect(stringArgumentsRange.length).toBe(9);
+            expect(cellArgumentsRange.length).toBe(9);
             // ...
             var cellToAddressMap = function (c) {
                 return c.getFullAddress();
@@ -137,6 +143,8 @@ describe('Sheet', function () { // Class
             expect(stringRange.map(cellToAddressMap)).toEqual(expectedAddresses);
             expect(stringArrayRange.map(cellToAddressMap)).toEqual(expectedAddresses);
             expect(cellArrayRange.map(cellToAddressMap)).toEqual(expectedAddresses);
+            expect(stringArgumentsRange.map(cellToAddressMap)).toEqual(expectedAddresses);
+            expect(cellArgumentsRange.map(cellToAddressMap)).toEqual(expectedAddresses);
         });
     });
 
