@@ -112,6 +112,32 @@ describe('Sheet', function () { // Class
     });
 
     describe("getCellRange", function () {
+        it("follows the design recipe", function () {
+            var stringRange = sheet.getCellRange('A1:C3');
+            var stringArrayRange = sheet.getCellRange(['A1', 'C3']);
+            var cellArrayRange = sheet.getCellRange([sheet.getCell('A1'), sheet.getCell('C3')]);
+            // ...
+            expect(stringRange instanceof Array).toBe(true);
+            expect(stringArrayRange instanceof Array).toBe(true);
+            expect(cellArrayRange instanceof Array).toBe(true);
+            // ...
+            expect(stringRange.length).toBe(9);
+            expect(stringArrayRange.length).toBe(9);
+            expect(cellArrayRange.length).toBe(9);
+            // ...
+            var cellToAddressMap = function (c) {
+                return c.getFullAddress();
+            };
+            var expectedAddresses = jasmine.arrayContaining([
+                "'Sheet1'!B1", "'Sheet1'!B2", "'Sheet1'!B3",
+                "'Sheet1'!A1", "'Sheet1'!A2", "'Sheet1'!A3",
+                "'Sheet1'!C1", "'Sheet1'!C2", "'Sheet1'!C3"
+            ]);
+            // ...
+            expect(stringRange.map(cellToAddressMap)).toEqual(expectedAddresses);
+            expect(stringArrayRange.map(cellToAddressMap)).toEqual(expectedAddresses);
+            expect(cellArrayRange.map(cellToAddressMap)).toEqual(expectedAddresses);
+        });
     });
 
     describe("setValues", function () {
